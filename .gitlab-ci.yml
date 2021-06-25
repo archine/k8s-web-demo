@@ -1,0 +1,56 @@
+before_script:
+    - export IMAGE_FULL_NAME=$CI_REGISTRY_URL:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
+stages:
+ - compile
+ - build
+ - run
+variables:
+  MAVEN_REPO: "/.m2"
+  PROJECT_NAME: "k8s-web"
+  K8S_FILE: "web-k8s.yml"
+compile:
+  stage: compile
+  image: 172.20.9.4:5001/gjing/maven:1.0
+  only:
+   - master
+  tags:
+   - pub
+  script:
+   - mvn -Dmaven.repo.local=$MAVEN_REPO clean package -Dmaven.test.skip=true
+  artifacts:
+    name: $PROJECT_NAME
+    expire_in: 1week
+    paths:
+     - target/*.jar
+build:
+  stage: build
+  image: docker:stable
+  only:
+    - master
+  tags:
+    - pub
+  script:
+    - docker login --username $CI_REGISTRY_USER --password $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t $IMAGE_FULL_NAME .
+    - docker push $IMAGE_FULL_NAME
+    - docker rmi -f $IMAGE_FULL_NAME
+run:
+  stage: run
+  image: roffe/kubectl
+  only:
+   - master
+  tags:
+   - pub
+  variables:
+    PROJECT_PORT: 8081
+    PROJECT_NAMESPACE: gj
+  script:
+   - mkdir -p /root/.kube
+   - echo $KUBE_CONFIG | base64 -d > /root/.kube/config
+   - export KUBECONFIG=/root/.kube/config
+   - kubectl version
+   - sed -i "s#{PROJECT_NAME}#$PROJECT_NAME#g;
+     s#{PROJECT_PORT}#$PROJECT_PORT#g;
+     s#{PROJECT_NAMESPACE}#PROJECT_NAMESPACE#g;
+     s#{PROJECT_IMAGE}#IMAGE_FULL_NAME#g" $K8S_FILE
+   - kubectl apply -f $K8S_FILE
