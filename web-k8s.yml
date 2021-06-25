@@ -40,10 +40,10 @@ spec:
               value: "{PROJECT_PORT}"
             - name: SERVER_NAME
               value: {PROJECT_NAME}
-            - name: EUREKA_HOST
+            - name: EUREKA_URL
               valueFrom:
                 configMapKeyRef: # 这里是取eureka项目里定义的configMap里的值
-                  name: eureka_host
+                  name: eureka-host
                   key: registry_url
             - name: HOST_NAME
               valueFrom:
