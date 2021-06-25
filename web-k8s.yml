@@ -35,6 +35,15 @@ spec:
           image: {PROJECT_IMAGE}
           ports:
             - containerPort: {PROJECT_PORT}
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: {PROJECT_PORT}
+            failureThreshold: 3 # 探测失败的阈值，超过则认定该pod失败状态
+            initialDelaySeconds: 60 # pod启动延迟多久进行检查
+            periodSeconds: 10 # 检查的周期
+            successThreshold: 1 # 探测成功的阈值，只要成功一次就认定pod为正常
+            timeoutSeconds: 10 # 超时时间，如果超时则认为pod是失败状态
           env:
             - name: SERVER_PORT
               value: "{PROJECT_PORT}"
