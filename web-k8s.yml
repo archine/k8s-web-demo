@@ -44,7 +44,7 @@ spec:
               valueFrom:
                 configMapKeyRef: # 这里是取eureka项目里定义的configMap里的值
                   name: eureka_host
-                  value: registry_url
+                  key: registry_url
             - name: HOST_NAME
               valueFrom:
                 fieldRef:
