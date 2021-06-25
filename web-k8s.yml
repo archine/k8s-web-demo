@@ -37,7 +37,7 @@ spec:
             - containerPort: {PROJECT_PORT}
           env:
             - name: SERVER_PORT
-              value: {PROJECT_PORT}
+              value: "{PROJECT_PORT}"
             - name: SERVER_NAME
               value: {PROJECT_NAME}
             - name: EUREKA_HOST
