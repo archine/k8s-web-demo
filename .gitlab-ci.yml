@@ -1,5 +1,5 @@
 before_script:
-    - export IMAGE_FULL_NAME=$CI_REGISTRY_URL:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
+    - export IMAGE_FULL_NAME=$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
 stages:
  - compile
  - build
